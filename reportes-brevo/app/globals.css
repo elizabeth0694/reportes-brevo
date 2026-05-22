@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff #171717;
+  --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Definiciones de tema */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,10 +13,38 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
-
+/* Estilos globales */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Márgenes físicos para la hoja impresa (añade espacio al inicio y al final) */
+@page {
+  margin-top: 20mm;
+  margin-bottom: 20mm;
+  margin-left: 10mm;
+  margin-right: 10mm;
+}
+
+/* Reglas específicas para la impresión */
+@media print {
+  /* Oculta los controles de filtro al imprimir */
+  .no-imprimir {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
 }
