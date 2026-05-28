@@ -20,31 +20,174 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Márgenes físicos para la hoja impresa (añade espacio al inicio y al final) */
 @page {
-  margin-top: 20mm;
-  margin-bottom: 20mm;
-  margin-left: 10mm;
-  margin-right: 10mm;
+  size: A4 landscape;
+  margin: 12mm 10mm 14mm 10mm;
 }
 
-/* Reglas específicas para la impresión */
 @media print {
-  /* Oculta los controles de filtro al imprimir */
   .no-imprimir {
     display: none !important;
   }
 
+  html,
   body {
+    width: 297mm;
     margin: 0;
     padding: 0;
+    background: white !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  main {
+    padding: 6mm 0 8mm 0 !important;
+  }
+
+  h1 {
+    margin: 0 0 8mm 0 !important;
+    font-size: 16pt !important;
+  }
+
+  .grid {
+    break-inside: avoid;
   }
 
   table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    font-size: 7.5pt !important;
     page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tbody {
+    display: table-row-group;
   }
 
   tr {
     page-break-inside: avoid;
+    break-inside: avoid;
   }
+
+  th,
+  td {
+    padding: 4px 3px !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+  }
+
+  th {
+    font-size: 7pt !important;
+  }
+
+  td {
+    font-size: 7pt !important;
+  }
+
+  td span:not(.marca-badge) {
+    white-space: normal !important;
+    font-size: 6.5pt !important;
+    padding: 2px 4px !important;
+  }
+
+  .marca-badge {
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 5.2pt !important;
+    line-height: 1 !important;
+    padding: 2px 4px !important;
+    max-width: 100% !important;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    /* Sube el ancho de la primera columna para que los nombres quepan holgadamente */
+    width: 32mm !important;
+    min-width: 32mm !important;
+  }
+
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 34mm !important;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5),
+  th:nth-child(6),
+  td:nth-child(6),
+  th:nth-child(7),
+  td:nth-child(7),
+  th:nth-child(8),
+  td:nth-child(8),
+  th:nth-child(9),
+  td:nth-child(9),
+  th:nth-child(10),
+  td:nth-child(10),
+  th:nth-child(11),
+  td:nth-child(11),
+  th:nth-child(12),
+  td:nth-child(12),
+  th:nth-child(13),
+  td:nth-child(13),
+  th:nth-child(14),
+  td:nth-child(14),
+  th:nth-child(15),
+  td:nth-child(15) {
+    width: auto !important;
+  }
+
+  .shadow-md,
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .rounded-xl,
+  .rounded-2xl {
+    border-radius: 4px !important;
+  }
+
+  /* Si el body tiene la clase para imprimir solo mailing, ocultamos el SMS y la linea divisoria */
+  body.imprimir-solo-mailing #seccion-sms,
+  body.imprimir-solo-mailing #linea-divisoria {
+    display: none !important;
+  }
+
+  /* Si el body tiene la clase para imprimir solo sms, ocultamos el mailing y la linea divisoria */
+  body.imprimir-solo-sms #seccion-mailing,
+  body.imprimir-solo-sms #linea-divisoria {
+    display: none !important;
+  }
+}
+
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }

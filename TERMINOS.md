@@ -109,3 +109,27 @@ El listado de carpetas que Next.js genera cuando escribes `npx create-next-app`:
 * **Recharts (Librería de Gráficos):**
   * *Técnico:* Biblioteca de visualización de datos construida sobre componentes de React y D3.js para renderizar gráficos declarativos y responsivos.
   * *Fácil:* Es un "Estuche de Dibujo Profesional". En lugar de dibujar las barras y ejes a mano con CSS, esta herramienta ya trae los moldes listos para que tú solo le pases los números.
+
+---
+
+## 🎛️ Servidor Avanzado, Descargas y Flujos Asíncronos (Fase 2)
+
+* **API Route (Ruta de API):**
+  * *Técnico:* Extensión del enrutador de Next.js que permite crear endpoints HTTP (servidor) dentro del proyecto. Se ejecutan en un entorno seguro de Node.js sin exponer código sensible al navegador.
+  * *Fácil:* Una "Ventanilla de Trámites Privada" en la parte trasera del negocio. El cliente (navegador) no puede entrar a la oficina del jefe, pero puede pedirle un reporte a través de esta ventanilla y el jefe se lo prepara de forma segura.
+* **Polling (Sondeo / Consulta periódica):**
+  * *Técnico:* Técnica de comunicación donde el cliente realiza peticiones HTTP repetidas a intervalos definidos (ej. cada 5 segundos) para comprobar el estado de un proceso asíncrono en el servidor.
+  * *Fácil:* Preguntar "¿Ya casi llegamos?" cada cinco minutos durante un viaje en auto hasta que por fin el chofer responda que sí.
+* **Promise Sharing (Coalescencia de Solicitudes):**
+  * *Técnico:* Patrón de diseño asíncrono que almacena en caché la promesa de una petición fetch activa. Si ocurren llamadas paralelas, se les devuelve la misma promesa en curso en lugar de iniciar nuevas conexiones.
+  * *Fácil:* Si tres amigos quieren pedir la misma pizza al mismo local al mismo tiempo, en lugar de que cada uno llame por su cuenta y saturen el teléfono, uno solo llama y los tres comparten el mismo pedido cuando llegue a la mesa.
+* **ExcelJS:**
+  * *Técnico:* Librería de Node.js y navegador para manipular y formatear libros de trabajo, hojas y celdas de Excel en formato XLSX, permitiendo estilos y fuentes avanzados.
+  * *Fácil:* Una "Fábrica Automatizada de Planillas Excel". Le das órdenes en código y te devuelve un archivo Excel bien pintadito con colores, bordes y negrita sin que tengas que abrir el programa de Microsoft.
+* **ArrayBuffer / TextDecoder:**
+  * *Técnico:* Objetos de JavaScript de bajo nivel para representar y leer buffers de datos binarios genéricos y decodificarlos en cadenas de texto legibles (como UTF-8).
+  * *Fácil:* El "Traductor de Idioma Binario". Permite al servidor tomar un archivo descargado de internet que viene como ceros y unos, y convertirlo en texto con letras comunes y corrientes para poder entenderlo.
+* **HTTP 429 Too Many Requests:**
+  * *Técnico:* Código de estado de error HTTP que indica que el cliente ha excedido el límite de tasa de solicitudes permitido por el servidor en un periodo de tiempo.
+  * *Fácil:* El cartel de "Cajero Ocupado: Espere por favor". Significa que le hiciste demasiadas preguntas seguidas a Brevo y te ha pedido amablemente que dejes pasar un minuto antes de volver a molestar.
+

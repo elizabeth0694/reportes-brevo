@@ -5,6 +5,7 @@ const pausa = (milisegundos: number) => new Promise(resolver => setTimeout(resol
 async function getCampaigns(status: string, apiKey: string) {
     const limit = 50; // Maximo que permite Brevo por peticion
     let offset = 0; // El marcador de pagina inicia en el renglon cero
+    let intentos429 = 0; // Contador de reintentos
 
     let todasLasCampanas: any[] = [];
     let seguirBuscando = true;
@@ -30,8 +31,21 @@ async function getCampaigns(status: string, apiKey: string) {
             if (!respuesta.ok) {
                 const errorReal = await respuesta.text();
                 console.log("🛑 BREVO RESPONDIO CON ERROR:", respuesta.status, errorReal);
+
+                if (respuesta.status === 429) {
+                    intentos429++;
+                    if (intentos429 <= 6) {
+                        console.log(`Brevo limito las solicitudes. Intento ${intentos429}/6. Esperando 60 segundos antes de continuar...`);
+                        await pausa(60000);
+                        continue;
+                    } else {
+                        console.log("Se supero el limite maximo de 6 reintentos por error 429. Deteniendo buscle de seguridad.");
+                    }
+                }
+
                 break;
             }
+
 
             const json = await respuesta.json();
             const campanasExtraidas = json.campaigns || [];
@@ -54,7 +68,7 @@ async function getCampaigns(status: string, apiKey: string) {
 }
 
 // Recibe el arreglo sucio de campanas y agrega o extrae la marca
-function processCampaigns(campaigns: any[], brandName: string) {
+function processCampaigns(campaigns: any[], brandName: string, apiSource: 'A' | 'B') {
     const processedData: any[] = [];
 
     campaigns.forEach(campaign => {
@@ -90,7 +104,7 @@ function processCampaigns(campaigns: any[], brandName: string) {
 
         // --- EXTRACCION DINAMICA DE MARCA ---
         let marcaFinal = brandName;
-        
+
         if (brandName === 'dinamico') {
             const marcasValidas = [
                 'ideal plastic',
@@ -139,11 +153,14 @@ function processCampaigns(campaigns: any[], brandName: string) {
         }
 
         processedData.push({
+            id: campaign.id,
+            apiSource,
             brand: marcaFinal,
             name, sent, delivered, aperturasUnicas, openRate,
             totalAperturas, clicsUnicos, clickRate, totalClics,
             unsubscribes, softBounces, hardBounces, dateStr, timeStr
         });
+
     });
 
     return processedData;
@@ -151,47 +168,66 @@ function processCampaigns(campaigns: any[], brandName: string) {
 
 let memoriaCache: any = null;
 let ultimaVezActualizado = 0;
+let promesaEnCurso: Promise<any> | null = null;
 
-export async function getAllProcessedCampaigns() {
+// Se obtiene la lista completa de campanas procesadas
+export async function getAllProcessedCampaigns(forceRefresh: boolean = false) {
     const ahora = Date.now();
-    const mediaHoraEnMilisegundos = 1800000; // 30 minutos
+    const unaHoraEnMilisegundos = 3600000; // 1 hora (60 minutos)
 
-    if (memoriaCache !== null && (ahora - ultimaVezActualizado < mediaHoraEnMilisegundos)) {
+    // Si ya hay una descarga activa en este preciso instante, las demas llamadas paralelas esperan su resultado
+    if (promesaEnCurso !== null) {
+        console.log("Ya hay una descarga en curso de Brevo. Compartiendo promesa activa...");
+        return promesaEnCurso;
+    }
+
+    // Si forceRefresh es false, se ignora la cache y se buscan datos frescos en Brevo
+    if (!forceRefresh && memoriaCache !== null && (ahora - ultimaVezActualizado < unaHoraEnMilisegundos)) {
         console.log("Entregando datos instantaneos desde la Memoria Manual...");
         return memoriaCache;
     }
 
-    console.log("Pasaron 30 minutos o no hay memoria. Descargando datos frescos de Brevo...");
-    
-    const keyA = process.env.BREVO_API_KEY_MARCA_A;
-    const keyB = process.env.BREVO_API_KEY_MARCA_B;
+    // Creamos la promesa de descarga compartida
+    promesaEnCurso = (async () => {
+        try {
+            console.log("Paso 1 hora o no hay memoria. Descargando datos frescos de Brevo...");
 
-    let todosLosDatosLimpios: any[] = [];
+            const keyA = process.env.BREVO_API_KEY_MARCA_A;
+            const keyB = process.env.BREVO_API_KEY_MARCA_B;
 
-    // Descargamos campanas de Marca A (Ideal Plastic Surgery)
-    if (keyA) {
-        console.log("Descargando campanas de Marca A (Ideal Plastic Surgery)...");
-        const sentA = await getCampaigns('sent', keyA);
-        const archiveA = await getCampaigns('archive', keyA);
-        const procesadosA = processCampaigns([...sentA, ...archiveA], 'Ideal Plastic Surgery');
-        todosLosDatosLimpios = [...todosLosDatosLimpios, ...procesadosA];
-    }
+            let todosLosDatosLimpios: any[] = [];
 
-    // Descargamos campanas de Marca B y le indicamos extraer las marcas de forma dinamica
-    if (keyB) {
-        console.log("Descargando campanas de Marca B...");
-        const sentB = await getCampaigns('sent', keyB);
-        const archiveB = await getCampaigns('archive', keyB);
-        
-        // Pasamos el parametro 'dinamico' para activar el extractor
-        const procesadosB = processCampaigns([...sentB, ...archiveB], 'dinamico');
-        todosLosDatosLimpios = [...todosLosDatosLimpios, ...procesadosB];
-    }
+            // Descargamos campanas de Marca A (Ideal Plastic Surgery)
+            if (keyA) {
+                console.log("Descargando campanas de Marca A (Ideal Plastic Surgery)...");
+                const sentA = await getCampaigns('sent', keyA);
+                await pausa(2000);
+                const archiveA = await getCampaigns('archive', keyA);
+                const procesadosA = processCampaigns([...sentA, ...archiveA], 'Ideal Plastic Surgery', 'A');
+                todosLosDatosLimpios = [...todosLosDatosLimpios, ...procesadosA];
+            }
 
-    if (todosLosDatosLimpios.length > 0) {
-        memoriaCache = todosLosDatosLimpios;
-        ultimaVezActualizado = ahora;
-    }
+            // Descargamos campanas de Marca B y le indicamos extraer las marcas de forma dinamica
+            if (keyB) {
+                console.log("Descargando campanas de Marca B...");
+                const sentB = await getCampaigns('sent', keyB);
+                await pausa(2000);
+                const archiveB = await getCampaigns('archive', keyB);
+                const procesadosB = processCampaigns([...sentB, ...archiveB], 'dinamico', 'B');
+                todosLosDatosLimpios = [...todosLosDatosLimpios, ...procesadosB];
+            }
 
-    return todosLosDatosLimpios;
+            if (todosLosDatosLimpios.length > 0) {
+                memoriaCache = todosLosDatosLimpios;
+                ultimaVezActualizado = Date.now();
+            }
+
+            return todosLosDatosLimpios;
+        } finally {
+            // Al terminar la descarga (con éxito o fallo), liberamos la promesa en curso
+            promesaEnCurso = null;
+        }
+    })();
+
+    return promesaEnCurso;
 }

@@ -28,4 +28,24 @@ Aprendimos el "Ritual de los 3 Pasos" para subir cambios a internet:
 - Usamos `border-collapse` para que las lineas internas de la tabla se vean limpias.
 
 ---
-**Firmado:** Tu asistente de programacion (Antigravity). ¡Buen trabajo hoy!
+
+## Sesión 2: Módulo de Reportes SMS y Modularidad
+
+Hoy logramos expandir la arquitectura del dashboard al integrar un servicio completamente nuevo: **Reportes SMS** (conectado en el futuro a la API v5 de **Hablame.co**).
+
+### 1. Arquitectura de Datos y Modularidad
+*   **Separación de Responsabilidades:** Aprendimos que para mantener el código limpio y mantenible, es una pésima práctica amontonar servicios diferentes en el mismo archivo. Creamos un archivo de datos independiente (`app/lib/hablame.ts`) y un componente de interfaz separado (`app/sms/DashboardSmsClient.tsx`).
+*   **El Ensamblador Central (page.tsx):** La página principal actúa como un director de orquesta asíncrono, solicitando los datos en paralelo de Brevo y de Hablame, y entregándolos a sus respectivas interfaces.
+
+### 2. Mapeo y Analítica de SMS
+*   Aprendimos a traducir los términos nativos de la plataforma de mensajería a estándares de analítica digital profesional:
+    *   *Sms solicitados* ➡️ **Total Enviados**
+    *   *Sms enviados* ➡️ **Total Entregados**
+    *   *Visitas de URL Shorter* ➡️ **Clics en Link** (que representa la interacción real del usuario con el enlace `hab.me`).
+
+### 3. Seguridad Multi-marca
+*   **Segregación de API Keys:** En lugar de diseñar una variable genérica, decidimos usar el sufijo de marca (`HABLAME_API_KEY_CASA_CANDELA`) para permitir que el sistema escale limpiamente cuando agreguemos más marcas en el futuro.
+
+---
+**Firmado:** Tu asistente de programacion (Antigravity). ¡Un salto de arquitectura espectacular hoy!
+

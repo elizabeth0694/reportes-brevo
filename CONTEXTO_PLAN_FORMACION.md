@@ -70,3 +70,5 @@ Desarrollar las competencias técnicas del equipo frontend mediante la construcc
 * **Estructura Arquitectónica:** App Router activado bajo configuración *No src/ directory* (la carpeta `app/` vive en la raíz).
 * **Estilos:** Tailwind CSS activado y elegido como motor principal.
 * **Lenguaje:** TypeScript activado (`.tsx`).
+* **Integración SMS (Hablame.co):** Inicio de la Fase de Reportes de SMS. Se decide implementar una estructura modular multi-marca para las API Keys de Hablame (comenzando con la marca **Casa Candela** bajo la variable `HABLAME_API_KEY_CASA_CANDELA`) para permitir escalar a múltiples cuentas en el futuro.
+
